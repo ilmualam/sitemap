@@ -41,8 +41,8 @@
     };
 
     function init() {
-        const container = document.getElementById('recentpostsae');
-        const navContainer = document.getElementById('recentpostnavfeed');
+        const container = document.getElementById('ilmualamfeed');
+        const navContainer = document.getElementById('iapost');
 
         if (!container || !navContainer) {
             console.error('Required containers not found: #ilmualamfeed or iapostnavfeed');
@@ -62,7 +62,7 @@
             /* CSS Isolation */
             #ilmualamfeed, iapostnavfeed {
                 all: initial;
-                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+                font-family: -apple-system, BlinkMacSystemFont, "Inter", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
             }
             #ilmualamfeed *, iapostnavfeed * {
                 all: revert;
@@ -375,7 +375,7 @@
     }
 
     function displayLabelNav() {
-        const navContainer = document.getElementById('recentpostnavfeed');
+        const navContainer = document.getElementById('iapostnavfeed');
         navContainer.innerHTML = '';
 
         const nav = document.createElement('nav');
@@ -536,7 +536,7 @@
     }
 
     function displayPosts(posts, labelName) {
-        const container = document.getElementById('recentpostsae');
+        const container = document.getElementById('ilmualamfeed');
         let html = `<h2 class="sitemap-header">${getEmojiForLabel(labelName)} ${labelName}</h2>`;
         html += '<div class="posts-grid">';
         posts.forEach((post, index) => {
@@ -581,7 +581,7 @@
     }
 
     function showLoading() {
-        const container = document.getElementById('recentpostsae');
+        const container = document.getElementById('ilmualamfeed');
         container.innerHTML = `
             <div class="loading-container">
                 <div class="loading-spinner"></div>
@@ -591,7 +591,7 @@
     }
 
     function showError(message) {
-        const container = document.getElementById('recentpostsae');
+        const container = document.getElementById('ilmualamfeed');
         container.innerHTML = `
             <div style="text-align: center; padding: 50px; color: #e74c3c;">
                 <p style="font-size: 48px; margin-bottom: 20px;">⚠️</p>
