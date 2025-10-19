@@ -423,7 +423,7 @@
 
     function getEmojiForLabel(label) {
         const emojiMap = {
-            'Islamik': '🍔', 'Doa': '✈️', 'Al-Quran': '💻', 'Motivasi': '🖥️', 'Surah': '🎉', 'Zikir': '🕌', 'Qasidah': '🚚', 'Hukum': '⭐', 'Inspirasi': '💪', 'Ramadan': '📌', 'Waktu Solat': '📚', 'Solat': '📰', 'Panduan': '🎬', 'Kisah Nabi': '📍', 'Feqah': '🍳', 'Akhlak': '📌', 'Fardhu Ain': '📚', 'Iqra': '📰', 'Mari Mengaji': '📰', 'Mari Mengaji': '📰',
+            'Islamik': '🕌', 'Doa': '🤲🏻', 'Al-Quran': '📖', 'Motivasi': 'ﷺ', 'Surah': '📄', 'Zikir': '📿', 'Qasidah': '👨🏼‍💻', 'Hukum': '🕋', 'Inspirasi': '💡', 'Ramadan': '✨', 'Waktu Solat': '🕗', 'Solat': '🛐', 'Panduan': '📝', 'Kisah Nabi': '🏜️', 'Feqah': '🍳', 'Akhlak': '👳‍♂️', 'Fardhu Ain': '📚', 'Iqra': '📜', 'Mari Mengaji': '📕',
         };
         const lowerLabel = label.toLowerCase();
         if (emojiMap[lowerLabel]) return emojiMap[lowerLabel];
