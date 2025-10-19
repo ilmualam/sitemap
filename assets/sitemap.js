@@ -452,7 +452,7 @@
         showLoading();
         cache.currentLabel = 'recent';
         if (cache.posts['recent'] && isCacheValid('recent')) {
-            displayPosts(cache.posts['recent'], 'Semua Post Terkini');
+            displayPosts(cache.posts['recent'], 'Artikel Terkini');
             return;
         }
         const script = document.createElement('script');
@@ -487,7 +487,7 @@
         const cacheKey = cache.currentLabel === 'recent' ? 'recent' : cache.currentLabel;
         cache.posts[cacheKey] = posts;
         cache.timestamp[cacheKey] = Date.now();
-        displayPosts(posts, cache.currentLabel === 'recent' ? 'Semua Post Terkini' : cache.currentLabel);
+        displayPosts(posts, cache.currentLabel === 'recent' ? 'Artikel Terkini' : cache.currentLabel);
     }
 
     function extractThumbnail(entry) {
@@ -585,7 +585,7 @@
         container.innerHTML = `
             <div class="loading-container">
                 <div class="loading-spinner"></div>
-                <p style="margin-top: 20px; color: #666;">Memuatkan kandungan...</p>
+                <p style="margin-top: 20px; color: #666;">Loading...</p>
             </div>
         `;
     }
@@ -611,8 +611,8 @@
                     "@type": "CollectionPage",
                     "@id": window.location.href + "#collection",
                     "url": window.location.href,
-                    "name": `${categoryName} - The Bukit Besi Blog`,
-                    "description": `Koleksi artikel blog tentang ${categoryName} di The Bukit Besi`,
+                    "name": `${categoryName} - Ilmu Alam Blog`,
+                    "description": `Koleksi artikel blog tentang ${categoryName} di Ilmu Alam`,
                     "isPartOf": { "@id": CONFIG.blogUrl + "#website" },
                     "hasPart": posts.map((post, index) => ({
                         "@type": "BlogPosting",
@@ -624,7 +624,7 @@
                     "@type": "WebSite",
                     "@id": CONFIG.blogUrl + "#website",
                     "url": CONFIG.blogUrl,
-                    "name": "The Bukit Besi",
+                    "name": "Ilmu Alam Motivasi Islamik",
                     "potentialAction": {
                         "@type": "SearchAction",
                         "target": CONFIG.blogUrl + "/search?q={search_term_string}",
@@ -648,7 +648,7 @@
                     "author": { "@type": "Person", "name": post.author },
                     "publisher": {
                         "@type": "Organization",
-                        "name": "The Bukit Besi",
+                        "name": "Ilmu Alam Blog",
                         "logo": { "@type": "ImageObject", "url": CONFIG.blogUrl + "/logo.png" }
                     },
                     "description": post.excerpt,
