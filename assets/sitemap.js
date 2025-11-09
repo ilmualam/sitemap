@@ -27,7 +27,7 @@
         blogUrl: 'https://www.ilmualam.com',
         postsPerLabel: 10,
         imageSize: 400,
-        defaultThumb: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"%3E%3Crect width="400" height="300" fill="%23f0f0f0"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%23999" font-family="sans-serif" font-size="16"%3ENo Image%3C/text%3E%3C/svg%3E',
+        defaultThumb: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"%3E%3Crect width="400" height="300" fill="%23f0f0f0"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%23999" font-family="Inter" font-size="16"%3ENo Image%3C/text%3E%3C/svg%3E',
         maxLabels: 25,
         excerptLength: 150,
         cacheExpiry: 3600000 // 1 hour cache
@@ -122,12 +122,12 @@
                 font-weight: 600;
             }
             iapostnavfeed .all-posts-btn {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: linear-gradient(135deg, #065c21 0%, #249749 100%);
                 color: #fff;
                 border: none;
             }
             iapostnavfeed .all-posts-btn:hover {
-                background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+                background: linear-gradient(135deg, #249749 0%, #065c21 100%);
             }
 
             /* Header */
@@ -135,7 +135,7 @@
                 text-align: center;
                 margin: 30px 0;
                 font-size: 32px;
-                color: #2c3e50;
+                color: #065c21;
                 font-weight: 700;
                 position: relative;
                 padding-bottom: 15px;
@@ -148,7 +148,7 @@
                 transform: translateX(-50%);
                 width: 80px;
                 height: 4px;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: linear-gradient(135deg, #065c21 0%, #249749 100%);
                 border-radius: 2px;
             }
 
@@ -182,7 +182,7 @@
                 left: 0;
                 right: 0;
                 height: 3px;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: linear-gradient(135deg, #065c21 0%, #249749 100%);
                 transform: scaleX(0);
                 transition: transform 0.3s;
             }
@@ -231,7 +231,7 @@
                 transition: color 0.3s;
             }
             #ilmualamfeed .post-title a:hover {
-                color: #667eea;
+                color: #065c21;
             }
             #ilmualamfeed .post-excerpt {
                 color: #6c757d;
@@ -263,7 +263,7 @@
                 font-size: 14px;
             }
             #ilmualamfeed .read-more {
-                color: #667eea;
+                color: #065c21;
                 text-decoration: none;
                 font-weight: 600;
                 transition: all 0.3s;
@@ -272,7 +272,7 @@
                 gap: 5px;
             }
             #ilmualamfeed .read-more:hover {
-                color: #764ba2;
+                color: #249749;
                 gap: 8px;
             }
 
@@ -286,7 +286,7 @@
                 width: 60px;
                 height: 60px;
                 border: 4px solid #f3f3f3;
-                border-top: 4px solid #667eea;
+                border-top: 4px solid #065c21;
                 border-radius: 50%;
                 animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
             }
