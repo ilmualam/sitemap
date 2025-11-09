@@ -1,6 +1,6 @@
 /**
- * @copyright    Copyright (C) 2025 - 2026 TheBukitBesi. All rights reserved.
- * @author       (https://thebukitbesi.com)
+ * @copyright    Copyright (C) 2025 - 2026 Ilmu Alam. All rights reserved.
+ * @author       (https://ilmualam.com)
  * @version      1.2.0
  * @license      All Rights Reserved
  * This source file is proprietary and confidential. Unauthorized copying,
@@ -17,7 +17,7 @@
  * Blogger Categorized Sitemap with Enhanced Thumbnails
  * Ultra-lightweight, SEO Optimized with Rich Schema.org
  * 5-column desktop grid, larger thumbnails, mobile optimized
- * Version 3.0 - Copyrighted by thebukitbesi.com
+ * Version 3.0 - Copyrighted by ilmualam.com
  */
 (function() {
     'use strict';
