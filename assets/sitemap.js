@@ -1,701 +1,898 @@
 /**
- * @copyright    Copyright (C) 2025 - 2026 Ilmu Alam. All rights reserved.
- * @author       (https://ilmualam.com)
- * @version      1.2.0
- * @license      All Rights Reserved
- * This source file is proprietary and confidential. Unauthorized copying,
- * modification, distribution, or use of this file, via any medium, is
- * strictly prohibited without the express written permission of the author.
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- _____________________________________________________________________________
- * Blogger Categorized Sitemap with Enhanced Thumbnails
- * Ultra-lightweight, SEO Optimized with Rich Schema.org
- * 5-column desktop grid, larger thumbnails, mobile optimized
- * Version 3.0 - Copyrighted by ilmualam.com
+ * IlmuAlam Sitemap - Advanced Blogger Sitemap with Islamic Emoji Mapping
+ * 
+ * @version 2.0.0
+ * @author (IlmuAlam)
+ * @license MIT
+ * @repository https://github.com/ismal/ilmualam-sitemap
+ * 
+ * Features:
+ * - Islamic category emoji mapping
+ * - Limited label display (max 20)
+ * - Brand color theming (#249749)
+ * - SEO optimized with JSON-LD schema
+ * - Responsive grid layout
+ * - Pagination with styling
+ * - YouTube thumbnail support
+ * - Lazy loading images
  */
+
 (function() {
     'use strict';
 
-    // Configuration
+    // ═══════════════════════════════════════════════════════════════════
+    // CONFIGURATION - Customize these values
+    // ═══════════════════════════════════════════════════════════════════
+    
     const CONFIG = {
+        // Blog Settings
         blogUrl: 'https://www.ilmualam.com',
-        postsPerLabel: 10,
-        imageSize: 400,
-        defaultThumb: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"%3E%3Crect width="400" height="300" fill="%23f0f0f0"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%23999" font-family="Inter" font-size="16"%3ENo Image%3C/text%3E%3C/svg%3E',
-        maxLabels: 25,
-        excerptLength: 150,
-        cacheExpiry: 3600000 // 1 hour cache
+        blogName: 'IlmuAlam',
+        
+        // Display Settings
+        postsPerPage: 12,
+        maxLabels: 20, // FIXED: Limit to 20 labels only
+        imageSize: 300,
+        excerptLength: 120,
+        
+        // Brand Colors
+        primaryColor: '#249749', // Your brand green
+        primaryHover: '#1e7d3d',
+        primaryLight: '#e8f5ec',
+        textDark: '#1a1a1a',
+        textMuted: '#666666',
+        
+        // Fallback Image
+        defaultThumb: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200"%3E%3Crect width="300" height="200" fill="%23f0f0f0"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%23999" font-family="sans-serif" font-size="14"%3E📷 Tiada Imej%3C/text%3E%3C/svg%3E',
+        
+        // Container IDs
+        containerId: 'ilmualam-sitemap-posts',
+        navContainerId: 'ilmualam-sitemap-nav',
+        paginationContainerId: 'ilmualam-sitemap-pagination'
     };
 
+    // ═══════════════════════════════════════════════════════════════════
+    // ISLAMIC EMOJI MAPPING - Complete category emojis
+    // ═══════════════════════════════════════════════════════════════════
+    
+    const EMOJI_MAP = {
+        // Quran & Surah
+        'quran': '📖',
+        'al-quran': '📖',
+        'surah': '📜',
+        'ayat': '✨',
+        'tafsir': '📚',
+        'hafazan': '🎯',
+        'tajwid': '🔊',
+        'qiraat': '🎵',
+        
+        // Prayer & Worship
+        'solat': '🕌',
+        'sembahyang': '🕌',
+        'doa': '🤲',
+        'zikir': '📿',
+        'wirid': '📿',
+        'ibadah': '🙏',
+        'taubat': '💚',
+        'istighfar': '🌙',
+        
+        // Islamic Calendar & Events
+        'ramadan': '🌙',
+        'puasa': '🌅',
+        'hari raya': '🎉',
+        'aidilfitri': '🎉',
+        'aidiladha': '🐑',
+        'maulidur rasul': '🌟',
+        'israk mikraj': '✨',
+        'nisfu syaaban': '🌕',
+        'muharam': '📅',
+        
+        // Zakat & Finance
+        'zakat': '💰',
+        'sedekah': '🤝',
+        'wakaf': '🏛️',
+        'faraid': '⚖️',
+        'harta': '💎',
+        
+        // Hajj & Umrah
+        'haji': '🕋',
+        'umrah': '🕋',
+        'tawaf': '🔄',
+        'mekah': '🕋',
+        'madinah': '🕌',
+        
+        // Islamic Knowledge
+        'hadis': '📜',
+        'hadith': '📜',
+        'sunnah': '☀️',
+        'fiqh': '⚖️',
+        'akidah': '💎',
+        'sirah': '📖',
+        'kisah nabi': '👳',
+        'kisah sahabat': '👥',
+        'sejarah islam': '🏛️',
+        
+        // Family & Life
+        'nikah': '💍',
+        'perkahwinan': '💒',
+        'keluarga': '👨‍👩‍👧‍👦',
+        'anak': '👶',
+        'ibu bapa': '👨‍👩‍👧',
+        'pendidikan': '🎓',
+        'akhlak': '💚',
+        'adab': '🌹',
+        
+        // Death & Afterlife
+        'kematian': '⚰️',
+        'jenazah': '🤲',
+        'kubur': '🪦',
+        'akhirat': '🌌',
+        'syurga': '🌈',
+        'neraka': '🔥',
+        
+        // Tools & Calculators
+        'kalkulator': '🧮',
+        'waktu solat': '⏰',
+        'arah kiblat': '🧭',
+        'hijrah': '📅',
+        'tarikh': '📆',
+        
+        // General Islamic
+        'islam': '☪️',
+        'muslim': '☪️',
+        'allah': '﷽',
+        'rasulullah': 'ﷺ',
+        'nabi': '👳',
+        'malaikat': '👼',
+        'jin': '👻',
+        'syaitan': '👿',
+        
+        // Health & Wellness
+        'kesihatan': '🏥',
+        'rawatan islam': '🌿',
+        'ruqyah': '📿',
+        'penawar': '💊',
+        
+        // Food
+        'halal': '✅',
+        'makanan': '🍽️',
+        'resepi': '👨‍🍳',
+        
+        // Miscellaneous
+        'tips': '💡',
+        'panduan': '📋',
+        'download': '⬇️',
+        'video': '🎬',
+        'audio': '🎧',
+        'ebook': '📱',
+        'aplikasi': '📲',
+        
+        // Default fallback
+        'default': '📌'
+    };
+
+    // ═══════════════════════════════════════════════════════════════════
+    // CACHE & STATE
+    // ═══════════════════════════════════════════════════════════════════
+    
     const cache = {
         labels: [],
         posts: {},
+        allPosts: [],
         currentLabel: null,
-        timestamp: {}
+        currentPage: 1,
+        totalPosts: 0
     };
 
-    function init() {
-        const container = document.getElementById('ilmualamfeed');
-        const navContainer = document.getElementById('iapost');
-
-        if (!container || !navContainer) {
-            console.error('Required containers not found: #ilmualamfeed or iapostnavfeed');
-            return;
+    // ═══════════════════════════════════════════════════════════════════
+    // UTILITY FUNCTIONS
+    // ═══════════════════════════════════════════════════════════════════
+    
+    /**
+     * Get emoji for a label (case-insensitive matching)
+     */
+    function getEmoji(label) {
+        const labelLower = label.toLowerCase().trim();
+        
+        // Direct match
+        if (EMOJI_MAP[labelLower]) {
+            return EMOJI_MAP[labelLower];
         }
-
-        injectBaseStyles();
-        loadLabels();
-    }
-
-    function injectBaseStyles() {
-        if (document.getElementById('sitemap-styles')) return;
-
-        const style = document.createElement('style');
-        style.id = 'sitemap-styles';
-        style.textContent = `
-            /* CSS Isolation */
-            #ilmualamfeed, iapostnavfeed {
-                all: initial;
-                font-family: -apple-system, BlinkMacSystemFont, "Inter", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-            }
-            #ilmualamfeed *, iapostnavfeed * {
-                all: revert;
-            }
-
-            /* Label Navigation */
-            iapostnavfeed .label-nav {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 12px;
-                margin-bottom: 30px;
-                justify-content: center;
-                padding: 0 15px;
-            }
-            iapostnavfeed .label-btn {
-                background: #fff;
-                border: 2px solid #e0e0e0;
-                padding: 10px 20px;
-                border-radius: 25px;
-                cursor: pointer;
-                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                font-size: 14px;
-                font-weight: 500;
-                text-decoration: none;
-                color: #333;
-                display: inline-flex;
-                align-items: center;
-                gap: 6px;
-                position: relative;
-                overflow: hidden;
-            }
-            iapostnavfeed .label-btn::before {
-                content: '';
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                width: 0;
-                height: 0;
-                background: rgba(0,0,0,0.05);
-                border-radius: 50%;
-                transform: translate(-50%, -50%);
-                transition: width 0.6s, height 0.6s;
-            }
-            iapostnavfeed .label-btn:hover::before {
-                width: 100%;
-                height: 100%;
-            }
-            iapostnavfeed .label-btn:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 6px 20px rgba(0,0,0,0.12);
-                border-color: #333;
-            }
-            iapostnavfeed .label-btn.active {
-                background: #333;
-                color: #fff;
-                border-color: #333;
-                font-weight: 600;
-            }
-            iapostnavfeed .all-posts-btn {
-                background: linear-gradient(135deg, #065c21 0%, #249749 100%);
-                color: #fff;
-                border: none;
-            }
-            iapostnavfeed .all-posts-btn:hover {
-                background: linear-gradient(135deg, #249749 0%, #065c21 100%);
-            }
-
-            /* Header */
-            #ilmualamfeed .sitemap-header {
-                text-align: center;
-                margin: 30px 0;
-                font-size: 32px;
-                color: #065c21;
-                font-weight: 700;
-                position: relative;
-                padding-bottom: 15px;
-            }
-            #ilmualamfeed .sitemap-header::after {
-                content: '';
-                position: absolute;
-                bottom: 0;
-                left: 50%;
-                transform: translateX(-50%);
-                width: 80px;
-                height: 4px;
-                background: linear-gradient(135deg, #065c21 0%, #249749 100%);
-                border-radius: 2px;
-            }
-
-            /* Posts Grid */
-            #ilmualamfeed .posts-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-                gap: 20px;
-                margin: 30px auto;
-                padding: 0 10px;
-                width: 100%;
-                max-width: 100%;
-            }
-
-            /* Post Card */
-            #ilmualamfeed .recentpost {
-                background: #fff;
-                border-radius: 16px;
-                overflow: hidden;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-                transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-                display: flex;
-                flex-direction: column;
-                height: 100%;
-                position: relative;
-            }
-            #ilmualamfeed .recentpost::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 3px;
-                background: linear-gradient(135deg, #065c21 0%, #249749 100%);
-                transform: scaleX(0);
-                transition: transform 0.3s;
-            }
-            #ilmualamfeed .recentpost:hover::before {
-                transform: scaleX(1);
-            }
-            #ilmualamfeed .recentpost:hover {
-                transform: translateY(-10px);
-                box-shadow: 0 12px 35px rgba(0,0,0,0.15);
-            }
-
-            /* Thumbnail */
-            #ilmualamfeed .post-thumb {
-                width: 100%;
-                height: 250px;
-                object-fit: cover;
-                background: #f5f5f5;
-                display: block;
-                transition: transform 0.5s;
-            }
-            #ilmualamfeed .recentpost:hover .post-thumb {
-                transform: scale(1.05);
-            }
-
-            /* Content */
-            #ilmualamfeed .post-content {
-                padding: 20px;
-                flex-grow: 1;
-                display: flex;
-                flex-direction: column;
-            }
-            #ilmualamfeed .post-title {
-                font-size: 17px;
-                font-weight: 600;
-                margin: 0 0 12px 0;
-                line-height: 1.4;
-                display: -webkit-box;
-                -webkit-line-clamp: 2;
-                -webkit-box-orient: vertical;
-                overflow: hidden;
-                min-height: 48px;
-            }
-            #ilmualamfeed .post-title a {
-                color: #2c3e50;
-                text-decoration: none;
-                transition: color 0.3s;
-            }
-            #ilmualamfeed .post-title a:hover {
-                color: #065c21;
-            }
-            #ilmualamfeed .post-excerpt {
-                color: #6c757d;
-                font-size: 14px;
-                line-height: 1.6;
-                flex-grow: 1;
-                margin-bottom: 15px;
-                display: -webkit-box;
-                -webkit-line-clamp: 3;
-                -webkit-box-orient: vertical;
-                overflow: hidden;
-            }
-            #ilmualamfeed .post-meta {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding-top: 15px;
-                border-top: 1px solid #f0f0f0;
-                font-size: 13px;
-                color: #95a5a6;
-            }
-            #ilmualamfeed .post-date {
-                display: flex;
-                align-items: center;
-                gap: 5px;
-            }
-            #ilmualamfeed .post-date::before {
-                content: '📅';
-                font-size: 14px;
-            }
-            #ilmualamfeed .read-more {
-                color: #065c21;
-                text-decoration: none;
-                font-weight: 600;
-                transition: all 0.3s;
-                display: flex;
-                align-items: center;
-                gap: 5px;
-            }
-            #ilmualamfeed .read-more:hover {
-                color: #249749;
-                gap: 8px;
-            }
-
-            /* Loading Animation */
-            #ilmualamfeed .loading-container {
-                text-align: center;
-                padding: 80px 20px;
-            }
-            #ilmualamfeed .loading-spinner {
-                display: inline-block;
-                width: 60px;
-                height: 60px;
-                border: 4px solid #f3f3f3;
-                border-top: 4px solid #065c21;
-                border-radius: 50%;
-                animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
-            }
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-            }
-
-            /* Responsive Design */
-             @media (max-width: 1200px) {
-                #ilmualamfeed .posts-grid {
-                    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-                }
-            }
-            @media (max-width: 992px) {
-                #ilmualamfeed .posts-grid {
-                    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-                }
-                #ilmualamfeed .sitemap-header {
-                    font-size: 28px;
-                }
-            }
-            @media (max-width: 768px) {
-                #ilmualamfeed .posts-grid {
-                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                }
-                #ilmualamfeed .post-thumb {
-                    height: 200px;
-                }
-            }
-            @media (max-width: 480px) {
-                #ilmualamfeed .posts-grid {
-                    grid-template-columns: 1fr;
-                }
-                #ilmualamfeed .sitemap-header {
-                    font-size: 24px;
-                }
-                iapostnavfeed .label-nav {
-                    gap: 8px;
-                }
-                iapostnavfeed .label-btn {
-                    padding: 8px 16px;
-                    font-size: 13px;
-                }
-            }
-        `;
-        document.head.appendChild(style);
-    }
-
-    function loadLabels() {
-        showLoading();
-        const script = document.createElement('script');
-        script.src = `${CONFIG.blogUrl}/feeds/posts/summary?alt=json-in-script&max-results=150&callback=BloggerSitemap.processLabels`;
-        script.onerror = () => {
-            console.error('Failed to load labels');
-            showError('Failed to load categories. Please refresh the page.');
-        };
-        document.head.appendChild(script);
-    }
-
-    function processLabels(data) {
-        const labelCount = new Map();
-        if (data.feed.entry) {
-            data.feed.entry.forEach(entry => {
-                if (entry.category) {
-                    entry.category.forEach(cat => {
-                        const count = labelCount.get(cat.term) || 0;
-                        labelCount.set(cat.term, count + 1);
-                    });
-                }
-            });
-        }
-
-        cache.labels = Array.from(labelCount.entries())
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, CONFIG.maxLabels)
-            .map(([label]) => label);
-
-        displayLabelNav();
-
-        if (cache.labels.length > 0) {
-            loadLabelPosts(cache.labels[0]);
-        } else {
-            loadRecentPosts();
-        }
-    }
-
-    function displayLabelNav() {
-        const navContainer = document.getElementById('iapostnavfeed');
-        navContainer.innerHTML = '';
-
-        const nav = document.createElement('nav');
-        nav.className = 'label-nav';
-        nav.setAttribute('role', 'navigation');
-        nav.setAttribute('aria-label', 'Category Navigation');
-
-        const allBtn = createLabelButton('📋 Semua Post', () => {
-            setActiveButton(allBtn);
-            loadRecentPosts();
-        }, 'label-btn all-posts-btn');
-        nav.appendChild(allBtn);
-
-        cache.labels.forEach(label => {
-            const btn = createLabelButton(
-                getEmojiForLabel(label) + ' ' + label,
-                () => {
-                    setActiveButton(btn);
-                    loadLabelPosts(label);
-                }
-            );
-            nav.appendChild(btn);
-        });
-
-        navContainer.appendChild(nav);
-    }
-
-    function createLabelButton(text, onClick, className = 'label-btn') {
-        const btn = document.createElement('button');
-        btn.className = className;
-        btn.textContent = text;
-        btn.onclick = onClick;
-        btn.setAttribute('aria-label', `View posts in ${text}`);
-        return btn;
-    }
-
-    function setActiveButton(activeBtn) {
-        document.querySelectorAll('iapostnavfeed .label-btn').forEach(btn => {
-            btn.classList.remove('active');
-            btn.setAttribute('aria-pressed', 'false');
-        });
-        activeBtn.classList.add('active');
-        activeBtn.setAttribute('aria-pressed', 'true');
-    }
-
-    function getEmojiForLabel(label) {
-        const emojiMap = {
-            'Islamik': '🕌', 'Doa': '🤲🏻', 'Al-Quran': '📖', 'Motivasi': 'ﷺ', 'Surah': '📄', 'Zikir': '📿', 'Qasidah': '👨🏼‍💻', 'Hukum': '🕋', 'Inspirasi': '💡', 'Ramadan': '✨', 'Waktu Solat': '🕗', 'Solat': '🛐', 'Panduan': '📝', 'Kisah Nabi': '🏜️', 'Feqah': '🍳', 'Akhlak': '👳‍♂️', 'Fardhu Ain': '📚', 'Iqra': '📜', 'Mari Mengaji': '📕'
-        };
-        const lowerLabel = label.toLowerCase();
-        if (emojiMap[lowerLabel]) return emojiMap[lowerLabel];
-        for (const [key, emoji] of Object.entries(emojiMap)) {
-            if (lowerLabel.includes(key) || key.includes(lowerLabel)) {
+        
+        // Partial match
+        for (const [key, emoji] of Object.entries(EMOJI_MAP)) {
+            if (labelLower.includes(key) || key.includes(labelLower)) {
                 return emoji;
             }
         }
-        return '📝';
+        
+        return EMOJI_MAP['default'];
     }
 
-    function loadLabelPosts(label) {
-        showLoading();
-        cache.currentLabel = label;
-        if (cache.posts[label] && isCacheValid(label)) {
-            displayPosts(cache.posts[label], label);
-            return;
+    /**
+     * Extract thumbnail from post
+     */
+    function getThumbnail(entry) {
+        // Try media:thumbnail
+        if (entry.media$thumbnail && entry.media$thumbnail.url) {
+            return entry.media$thumbnail.url
+                .replace(/\/s\d+(-c)?(-[a-z]+)?\//, `/s${CONFIG.imageSize}/`);
         }
-        const script = document.createElement('script');
-        script.src = `${CONFIG.blogUrl}/feeds/posts/default/-/${encodeURIComponent(label)}?alt=json-in-script&max-results=${CONFIG.postsPerLabel}&callback=BloggerSitemap.processPosts`;
-        script.onerror = () => showError(`Failed to load posts for ${label}`);
-        document.head.appendChild(script);
-    }
-
-    function loadRecentPosts() {
-        showLoading();
-        cache.currentLabel = 'recent';
-        if (cache.posts['recent'] && isCacheValid('recent')) {
-            displayPosts(cache.posts['recent'], 'Artikel Terkini');
-            return;
-        }
-        const script = document.createElement('script');
-        script.src = `${CONFIG.blogUrl}/feeds/posts/default?alt=json-in-script&max-results=25&orderby=published&callback=BloggerSitemap.processPosts`;
-        script.onerror = () => showError('Failed to load recent posts');
-        document.head.appendChild(script);
-    }
-
-    function isCacheValid(key) {
-        const timestamp = cache.timestamp[key];
-        return timestamp && (Date.now() - timestamp < CONFIG.cacheExpiry);
-    }
-
-    function processPosts(data) {
-        const posts = [];
-        if (data.feed.entry) {
-            data.feed.entry.forEach(entry => {
-                const post = {
-                    title: entry.title.$t,
-                    url: entry.link.find(l => l.rel === 'alternate')?.href || '',
-                    thumbnail: extractThumbnail(entry),
-                    excerpt: extractExcerpt(entry),
-                    published: new Date(entry.published.$t),
-                    updated: new Date(entry.updated.$t),
-                    author: entry.author?.[0]?.name?.$t || 'Admin',
-                    labels: entry.category ? entry.category.map(c => c.term) : [],
-                    commentsCount: entry.thr$total ? entry.thr$total.$t : '0'
-                };
-                posts.push(post);
-            });
-        }
-        const cacheKey = cache.currentLabel === 'recent' ? 'recent' : cache.currentLabel;
-        cache.posts[cacheKey] = posts;
-        cache.timestamp[cacheKey] = Date.now();
-        displayPosts(posts, cache.currentLabel === 'recent' ? 'Artikel Terkini' : cache.currentLabel);
-    }
-
-    function extractThumbnail(entry) {
-        if (entry.media$thumbnail) {
-            return optimizeImageUrl(entry.media$thumbnail.url);
-        }
-        const content = entry.content?.$t || entry.summary?.$t || '';
-        const patterns = [
-            /<img[^>]+src=["']([^"']+)["']/i,
-            /<img[^>]+data-src=["']([^"']+)["']/i,
-            /\[img\]([^\[]+)\[\/img\]/i
-        ];
-        for (const pattern of patterns) {
-            const match = content.match(pattern);
-            if (match && match[1]) {
-                return optimizeImageUrl(match[1]);
+        
+        // Try content for YouTube thumbnails
+        if (entry.content && entry.content.$t) {
+            const content = entry.content.$t;
+            
+            // YouTube thumbnail
+            const ytMatch = content.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+            if (ytMatch) {
+                return `https://img.youtube.com/vi/${ytMatch[1]}/mqdefault.jpg`;
+            }
+            
+            // First image in content
+            const imgMatch = content.match(/<img[^>]+src=["']([^"']+)["']/i);
+            if (imgMatch) {
+                return imgMatch[1]
+                    .replace(/\/s\d+(-c)?(-[a-z]+)?\//, `/s${CONFIG.imageSize}/`);
             }
         }
-        const youtubeMatch = content.match(/(?:youtube\.com\/embed\/|youtu\.be\/)([^"&?\/\s]{11})/);
-        if (youtubeMatch) {
-            return `https://i.ytimg.com/vi/${youtubeMatch[1]}/hqdefault.jpg`;
-        }
+        
         return CONFIG.defaultThumb;
     }
 
-    function optimizeImageUrl(url) {
-        if (url.includes('blogspot.com') || url.includes('googleusercontent.com')) {
-            return url.replace(/\/s\d+(-c)?(-[a-z]+)?\//, `/w${CONFIG.imageSize}-h${Math.round(CONFIG.imageSize * 0.75)}-c/`);
+    /**
+     * Create excerpt from content
+     */
+    function createExcerpt(entry) {
+        let text = '';
+        
+        if (entry.summary && entry.summary.$t) {
+            text = entry.summary.$t;
+        } else if (entry.content && entry.content.$t) {
+            text = entry.content.$t;
         }
-        if (url.includes('imgur.com')) {
-            return url.replace(/\.(jpg|jpeg|png|gif)$/i, `l.$1`);
+        
+        // Strip HTML and trim
+        text = text.replace(/<[^>]+>/g, '').trim();
+        
+        if (text.length > CONFIG.excerptLength) {
+            text = text.substring(0, CONFIG.excerptLength).trim() + '...';
         }
-        return url;
+        
+        return text;
     }
 
-    function extractExcerpt(entry) {
-        const content = entry.content?.$t || entry.summary?.$t || '';
-        let text = content
-            .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-            .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
-            .replace(/<[^>]+>/g, ' ')
-            .replace(/\s+/g, ' ')
-            .trim();
-        text = text.replace(/\[...\]|\.\.\./g, '');
-        return text.length > CONFIG.excerptLength ? text.substring(0, CONFIG.excerptLength).trim() + '...' : text;
+    /**
+     * Format date
+     */
+    function formatDate(dateStr) {
+        const date = new Date(dateStr);
+        const options = { day: 'numeric', month: 'short', year: 'numeric' };
+        return date.toLocaleDateString('ms-MY', options);
     }
 
-    function displayPosts(posts, labelName) {
-        const container = document.getElementById('ilmualamfeed');
-        let html = `<h2 class="sitemap-header">${getEmojiForLabel(labelName)} ${labelName}</h2>`;
-        html += '<div class="posts-grid">';
-        posts.forEach((post, index) => {
-            const date = formatDate(post.published);
+    /**
+     * Get post URL
+     */
+    function getPostUrl(entry) {
+        for (const link of entry.link) {
+            if (link.rel === 'alternate') {
+                return link.href;
+            }
+        }
+        return '#';
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // RENDER FUNCTIONS
+    // ═══════════════════════════════════════════════════════════════════
+    
+    /**
+     * Show loading state
+     */
+    function showLoading() {
+        const container = document.getElementById(CONFIG.containerId);
+        if (container) {
+            container.innerHTML = `
+                <div class="ilmualam-loading">
+                    <div class="ilmualam-spinner"></div>
+                    <p>Memuatkan artikel...</p>
+                </div>
+            `;
+        }
+    }
+
+    /**
+     * Render label navigation
+     */
+    function renderLabels() {
+        const navContainer = document.getElementById(CONFIG.navContainerId);
+        if (!navContainer) return;
+
+        // Sort by post count and limit to maxLabels
+        const sortedLabels = cache.labels
+            .sort((a, b) => b.count - a.count)
+            .slice(0, CONFIG.maxLabels);
+
+        let html = `
+            <button class="ilmualam-label-btn ${!cache.currentLabel ? 'active' : ''}" 
+                    onclick="IlmuAlamSitemap.loadAllPosts()">
+                📚 Semua
+            </button>
+        `;
+
+        sortedLabels.forEach(label => {
+            const emoji = getEmoji(label.name);
+            const isActive = cache.currentLabel === label.name ? 'active' : '';
             html += `
-                <article class="recentpost" itemscope itemtype="https://schema.org/BlogPosting">
-                    <meta itemprop="headline" content="${escapeHtml(post.title)}">
-                    <meta itemprop="datePublished" content="${post.published.toISOString()}">
-                    <meta itemprop="author" content="${post.author}">
-                    <img class="post-thumb" src="${post.thumbnail}" alt="${escapeHtml(post.title)}" loading="${index < 5 ? 'eager' : 'lazy'}" onerror="this.src='${CONFIG.defaultThumb}'" itemprop="image">
-                    <div class="post-content">
-                        <h3 class="post-title">
-                            <a href="${post.url}" rel="bookmark" itemprop="url" title="${escapeHtml(post.title)}">${escapeHtml(post.title)}</a>
+                <button class="ilmualam-label-btn ${isActive}" 
+                        onclick="IlmuAlamSitemap.loadLabel('${label.name.replace(/'/g, "\\'")}')">
+                    ${emoji} ${label.name}
+                </button>
+            `;
+        });
+
+        navContainer.innerHTML = html;
+    }
+
+    /**
+     * Render posts grid
+     */
+    function renderPosts(posts) {
+        const container = document.getElementById(CONFIG.containerId);
+        if (!container) return;
+
+        if (!posts || posts.length === 0) {
+            container.innerHTML = `
+                <div class="ilmualam-no-posts">
+                    <p>🔍 Tiada artikel dijumpai dalam kategori ini.</p>
+                </div>
+            `;
+            return;
+        }
+
+        let html = '<div class="ilmualam-grid">';
+
+        posts.forEach(post => {
+            const title = post.title.$t;
+            const url = getPostUrl(post);
+            const thumbnail = getThumbnail(post);
+            const excerpt = createExcerpt(post);
+            const date = formatDate(post.published.$t);
+
+            html += `
+                <article class="ilmualam-card">
+                    <a href="${url}" class="ilmualam-card-image">
+                        <img src="${thumbnail}" 
+                             alt="${title}" 
+                             loading="lazy"
+                             onerror="this.src='${CONFIG.defaultThumb}'">
+                    </a>
+                    <div class="ilmualam-card-content">
+                        <h3 class="ilmualam-card-title">
+                            <a href="${url}">${title}</a>
                         </h3>
-                        ${post.excerpt ? `<p class="post-excerpt" itemprop="description">${escapeHtml(post.excerpt)}</p>` : ''}
-                        <div class="post-meta">
-                            <time class="post-date" datetime="${post.published.toISOString()}">${date}</time>
-                            <a href="${post.url}" class="read-more" aria-label="Read more about ${escapeHtml(post.title)}">
-                                Read More →
-                            </a>
+                        <p class="ilmualam-card-excerpt">${excerpt}</p>
+                        <div class="ilmualam-card-meta">
+                            <span class="ilmualam-card-date">📅 ${date}</span>
+                            <a href="${url}" class="ilmualam-read-more">Baca Lagi →</a>
                         </div>
                     </div>
                 </article>
             `;
         });
+
         html += '</div>';
         container.innerHTML = html;
-        generateEnhancedSchema(posts, labelName);
-        if ('IntersectionObserver' in window) {
-            lazyLoadImages();
+    }
+
+    /**
+     * Render pagination
+     */
+    function renderPagination(totalPosts, currentPage) {
+        const paginationContainer = document.getElementById(CONFIG.paginationContainerId);
+        if (!paginationContainer) return;
+
+        const totalPages = Math.ceil(totalPosts / CONFIG.postsPerPage);
+        
+        if (totalPages <= 1) {
+            paginationContainer.innerHTML = '';
+            return;
+        }
+
+        let html = '<div class="ilmualam-pagination">';
+
+        // Previous button
+        if (currentPage > 1) {
+            html += `
+                <button class="ilmualam-page-btn" onclick="IlmuAlamSitemap.goToPage(${currentPage - 1})">
+                    ← Sebelum
+                </button>
+            `;
+        }
+
+        // Page numbers
+        const startPage = Math.max(1, currentPage - 2);
+        const endPage = Math.min(totalPages, currentPage + 2);
+
+        if (startPage > 1) {
+            html += `<button class="ilmualam-page-btn" onclick="IlmuAlamSitemap.goToPage(1)">1</button>`;
+            if (startPage > 2) {
+                html += `<span class="ilmualam-page-dots">...</span>`;
+            }
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            const isActive = i === currentPage ? 'active' : '';
+            html += `
+                <button class="ilmualam-page-btn ${isActive}" onclick="IlmuAlamSitemap.goToPage(${i})">
+                    ${i}
+                </button>
+            `;
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                html += `<span class="ilmualam-page-dots">...</span>`;
+            }
+            html += `<button class="ilmualam-page-btn" onclick="IlmuAlamSitemap.goToPage(${totalPages})">${totalPages}</button>`;
+        }
+
+        // Next button
+        if (currentPage < totalPages) {
+            html += `
+                <button class="ilmualam-page-btn" onclick="IlmuAlamSitemap.goToPage(${currentPage + 1})">
+                    Seterusnya →
+                </button>
+            `;
+        }
+
+        html += '</div>';
+        paginationContainer.innerHTML = html;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // DATA LOADING FUNCTIONS
+    // ═══════════════════════════════════════════════════════════════════
+    
+    /**
+     * Initialize sitemap - load labels
+     */
+    function init() {
+        injectStyles();
+        injectSchema();
+        showLoading();
+        
+        // Load all posts to extract labels
+        const script = document.createElement('script');
+        script.src = `${CONFIG.blogUrl}/feeds/posts/summary?alt=json-in-script&max-results=500&callback=IlmuAlamSitemap.processLabels`;
+        script.onerror = () => {
+            console.error('Failed to load blog feed');
+            const container = document.getElementById(CONFIG.containerId);
+            if (container) {
+                container.innerHTML = '<p class="ilmualam-error">Gagal memuatkan data. Sila cuba lagi.</p>';
+            }
+        };
+        document.head.appendChild(script);
+    }
+
+    /**
+     * Process labels from feed
+     */
+    function processLabels(data) {
+        if (!data.feed || !data.feed.entry) {
+            console.error('No entries in feed');
+            return;
+        }
+
+        const entries = data.feed.entry;
+        const labelMap = new Map();
+
+        // Store all posts
+        cache.allPosts = entries;
+
+        // Extract labels with counts
+        entries.forEach(entry => {
+            if (entry.category) {
+                entry.category.forEach(cat => {
+                    const name = cat.term;
+                    if (labelMap.has(name)) {
+                        labelMap.get(name).count++;
+                    } else {
+                        labelMap.set(name, { name, count: 1 });
+                    }
+                });
+            }
+        });
+
+        // Convert to array
+        cache.labels = Array.from(labelMap.values());
+
+        // Render labels and load all posts
+        renderLabels();
+        loadAllPosts();
+    }
+
+    /**
+     * Load all posts
+     */
+    function loadAllPosts() {
+        cache.currentLabel = null;
+        cache.currentPage = 1;
+        cache.totalPosts = cache.allPosts.length;
+
+        renderLabels();
+        displayPage(cache.allPosts, 1);
+    }
+
+    /**
+     * Load posts by label
+     */
+    function loadLabel(labelName) {
+        cache.currentLabel = labelName;
+        cache.currentPage = 1;
+
+        // Filter posts by label
+        const filteredPosts = cache.allPosts.filter(post => {
+            if (!post.category) return false;
+            return post.category.some(cat => cat.term === labelName);
+        });
+
+        cache.posts[labelName] = filteredPosts;
+        cache.totalPosts = filteredPosts.length;
+
+        renderLabels();
+        displayPage(filteredPosts, 1);
+    }
+
+    /**
+     * Display specific page of posts
+     */
+    function displayPage(posts, page) {
+        cache.currentPage = page;
+        
+        const startIndex = (page - 1) * CONFIG.postsPerPage;
+        const endIndex = startIndex + CONFIG.postsPerPage;
+        const pagePosts = posts.slice(startIndex, endIndex);
+
+        renderPosts(pagePosts);
+        renderPagination(posts.length, page);
+
+        // Scroll to top of container
+        const container = document.getElementById(CONFIG.containerId);
+        if (container) {
+            container.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     }
 
-    function formatDate(date) {
-        const months = ['Jan', 'Feb', 'Mac', 'Apr', 'Mei', 'Jun', 'Jul', 'Ogos', 'Sep', 'Okt', 'Nov', 'Dis'];
-        return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+    /**
+     * Go to specific page
+     */
+    function goToPage(page) {
+        const posts = cache.currentLabel 
+            ? cache.posts[cache.currentLabel] 
+            : cache.allPosts;
+        
+        displayPage(posts, page);
     }
 
-    function escapeHtml(text) {
-        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;', '/': '&#x2F;' };
-        return text.replace(/[&<>"'/]/g, m => map[m]);
-    }
+    // ═══════════════════════════════════════════════════════════════════
+    // STYLE INJECTION
+    // ═══════════════════════════════════════════════════════════════════
+    
+    function injectStyles() {
+        if (document.getElementById('ilmualam-sitemap-styles')) return;
 
-    function showLoading() {
-        const container = document.getElementById('ilmualamfeed');
-        container.innerHTML = `
-            <div class="loading-container">
-                <div class="loading-spinner"></div>
-                <p style="margin-top: 20px; color: #666;">Loading...</p>
-            </div>
+        const css = `
+            /* IlmuAlam Sitemap Styles - Scoped */
+            
+            /* Reset for sitemap container */
+            #ilmualam-sitemap-wrapper * {
+                box-sizing: border-box;
+            }
+            
+            /* Label Navigation */
+            #${CONFIG.navContainerId} {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                margin-bottom: 24px;
+                padding: 16px;
+                background: #f8f9fa;
+                border-radius: 12px;
+            }
+            
+            .ilmualam-label-btn {
+                padding: 8px 16px;
+                border: 2px solid ${CONFIG.primaryColor};
+                background: white;
+                color: ${CONFIG.primaryColor};
+                border-radius: 25px;
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: 500;
+                transition: all 0.3s ease;
+                white-space: nowrap;
+            }
+            
+            .ilmualam-label-btn:hover,
+            .ilmualam-label-btn.active {
+                background: ${CONFIG.primaryColor};
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(36, 151, 73, 0.3);
+            }
+            
+            /* Posts Grid */
+            .ilmualam-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 24px;
+                margin-bottom: 32px;
+            }
+            
+            /* Card Styles */
+            .ilmualam-card {
+                background: white;
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+                transition: all 0.3s ease;
+            }
+            
+            .ilmualam-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            }
+            
+            .ilmualam-card-image {
+                display: block;
+                position: relative;
+                padding-top: 60%;
+                overflow: hidden;
+            }
+            
+            .ilmualam-card-image img {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.3s ease;
+            }
+            
+            .ilmualam-card:hover .ilmualam-card-image img {
+                transform: scale(1.05);
+            }
+            
+            .ilmualam-card-content {
+                padding: 16px;
+            }
+            
+            .ilmualam-card-title {
+                margin: 0 0 8px;
+                font-size: 16px;
+                line-height: 1.4;
+            }
+            
+            .ilmualam-card-title a {
+                color: ${CONFIG.textDark};
+                text-decoration: none;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+            
+            .ilmualam-card-title a:hover {
+                color: ${CONFIG.primaryColor};
+            }
+            
+            .ilmualam-card-excerpt {
+                color: ${CONFIG.textMuted};
+                font-size: 13px;
+                line-height: 1.5;
+                margin: 0 0 12px;
+                display: -webkit-box;
+                -webkit-line-clamp: 3;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+            
+            .ilmualam-card-meta {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                font-size: 12px;
+            }
+            
+            .ilmualam-card-date {
+                color: ${CONFIG.textMuted};
+            }
+            
+            /* READ MORE - Brand Color */
+            .ilmualam-read-more {
+                color: ${CONFIG.primaryColor} !important;
+                text-decoration: none;
+                font-weight: 600;
+                transition: all 0.2s ease;
+            }
+            
+            .ilmualam-read-more:hover {
+                color: ${CONFIG.primaryHover} !important;
+                text-decoration: underline;
+            }
+            
+            /* Pagination - Brand Color */
+            .ilmualam-pagination {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 8px;
+                flex-wrap: wrap;
+                margin: 32px 0;
+            }
+            
+            .ilmualam-page-btn {
+                padding: 10px 16px;
+                border: 2px solid ${CONFIG.primaryColor};
+                background: white;
+                color: ${CONFIG.primaryColor};
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: 500;
+                transition: all 0.3s ease;
+                min-width: 44px;
+            }
+            
+            .ilmualam-page-btn:hover,
+            .ilmualam-page-btn.active {
+                background: ${CONFIG.primaryColor};
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(36, 151, 73, 0.3);
+            }
+            
+            .ilmualam-page-dots {
+                color: ${CONFIG.textMuted};
+                padding: 0 8px;
+            }
+            
+            /* Loading State */
+            .ilmualam-loading {
+                text-align: center;
+                padding: 60px 20px;
+            }
+            
+            .ilmualam-spinner {
+                width: 40px;
+                height: 40px;
+                border: 4px solid #f3f3f3;
+                border-top: 4px solid ${CONFIG.primaryColor};
+                border-radius: 50%;
+                margin: 0 auto 16px;
+                animation: ilmualam-spin 0.8s linear infinite;
+            }
+            
+            @keyframes ilmualam-spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+            
+            .ilmualam-no-posts,
+            .ilmualam-error {
+                text-align: center;
+                padding: 40px 20px;
+                color: ${CONFIG.textMuted};
+                font-size: 16px;
+            }
+            
+            /* Responsive */
+            @media (max-width: 768px) {
+                .ilmualam-grid {
+                    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+                    gap: 16px;
+                }
+                
+                #${CONFIG.navContainerId} {
+                    gap: 6px;
+                    padding: 12px;
+                }
+                
+                .ilmualam-label-btn {
+                    padding: 6px 12px;
+                    font-size: 12px;
+                }
+                
+                .ilmualam-page-btn {
+                    padding: 8px 12px;
+                    font-size: 12px;
+                    min-width: 38px;
+                }
+            }
+            
+            @media (max-width: 480px) {
+                .ilmualam-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
         `;
+
+        const style = document.createElement('style');
+        style.id = 'ilmualam-sitemap-styles';
+        style.textContent = css;
+        document.head.appendChild(style);
     }
 
-    function showError(message) {
-        const container = document.getElementById('ilmualamfeed');
-        container.innerHTML = `
-            <div style="text-align: center; padding: 50px; color: #e74c3c;">
-                <p style="font-size: 48px; margin-bottom: 20px;">⚠️</p>
-                <p>${message}</p>
-                <button onclick="BloggerSitemap.init()" style="margin-top: 20px; padding: 10px 20px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                    Cuba Semula
-                </button>
-            </div>
-        `;
-    }
+    // ═══════════════════════════════════════════════════════════════════
+    // SCHEMA INJECTION - SEO
+    // ═══════════════════════════════════════════════════════════════════
+    
+    function injectSchema() {
+        if (document.getElementById('ilmualam-sitemap-schema')) return;
 
-    function generateEnhancedSchema(posts, categoryName) {
         const schema = {
             "@context": "https://schema.org",
-            "@graph": [
-                {
-                    "@type": "CollectionPage",
-                    "@id": window.location.href + "#collection",
-                    "url": window.location.href,
-                    "name": `${categoryName} - Ilmu Alam Blog`,
-                    "description": `Koleksi artikel blog tentang ${categoryName} di Ilmu Alam`,
-                    "isPartOf": { "@id": CONFIG.blogUrl + "#website" },
-                    "hasPart": posts.map((post, index) => ({
-                        "@type": "BlogPosting",
-                        "@id": post.url + "#blogpost",
-                        "position": index + 1
-                    }))
-                },
-                {
-                    "@type": "WebSite",
-                    "@id": CONFIG.blogUrl + "#website",
-                    "url": CONFIG.blogUrl,
-                    "name": "Ilmu Alam Motivasi Islamik",
-                    "potentialAction": {
-                        "@type": "SearchAction",
-                        "target": CONFIG.blogUrl + "/search?q={search_term_string}",
-                        "query-input": "required name=search_term_string"
-                    }
-                },
-                ...posts.map((post, index) => ({
-                    "@type": "BlogPosting",
-                    "@id": post.url + "#blogpost",
-                    "headline": post.title,
-                    "url": post.url,
-                    "mainEntityOfPage": { "@type": "WebPage", "@id": post.url },
-                    "image": post.thumbnail !== CONFIG.defaultThumb ? {
-                        "@type": "ImageObject",
-                        "url": post.thumbnail,
-                        "width": CONFIG.imageSize,
-                        "height": Math.round(CONFIG.imageSize * 0.75)
-                    } : undefined,
-                    "datePublished": post.published.toISOString(),
-                    "dateModified": post.updated.toISOString(),
-                    "author": { "@type": "Person", "name": post.author },
-                    "publisher": {
-                        "@type": "Organization",
-                        "name": "Ilmu Alam Blog",
-                        "logo": { "@type": "ImageObject", "url": CONFIG.blogUrl + "/logo.png" }
+            "@type": "CollectionPage",
+            "name": "Sitemap - " + CONFIG.blogName,
+            "description": "Arkib lengkap artikel Islam, panduan solat, bacaan Quran, dan ilmu agama dari " + CONFIG.blogName,
+            "url": CONFIG.blogUrl + "/p/sitemap.html",
+            "isPartOf": {
+                "@type": "WebSite",
+                "name": CONFIG.blogName,
+                "url": CONFIG.blogUrl
+            },
+            "breadcrumb": {
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    {
+                        "@type": "ListItem",
+                        "position": 1,
+                        "name": "Laman Utama",
+                        "item": CONFIG.blogUrl
                     },
-                    "description": post.excerpt,
-                    "keywords": post.labels.join(", "),
-                    "articleSection": categoryName,
-                    "inLanguage": "ms-MY"
-                }))
-            ]
+                    {
+                        "@type": "ListItem",
+                        "position": 2,
+                        "name": "Sitemap",
+                        "item": CONFIG.blogUrl + "/p/sitemap.html"
+                    }
+                ]
+            }
         };
-        let scriptTag = document.getElementById('sitemap-schema');
-        if (!scriptTag) {
-            scriptTag = document.createElement('script');
-            scriptTag.type = 'application/ld+json';
-            scriptTag.id = 'sitemap-schema';
-            document.head.appendChild(scriptTag);
-        }
-        scriptTag.textContent = JSON.stringify(schema);
+
+        const script = document.createElement('script');
+        script.id = 'ilmualam-sitemap-schema';
+        script.type = 'application/ld+json';
+        script.textContent = JSON.stringify(schema);
+        document.head.appendChild(script);
     }
 
-    function lazyLoadImages() {
-        const images = document.querySelectorAll('img[loading="lazy"]');
-        const imageObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const img = entry.target;
-                    img.src = img.src;
-                    imageObserver.unobserve(img);
-                }
-            });
-        }, { rootMargin: '50px 0px' });
-        images.forEach(img => imageObserver.observe(img));
-    }
-
-    window.BloggerSitemap = {
+    // ═══════════════════════════════════════════════════════════════════
+    // PUBLIC API
+    // ═══════════════════════════════════════════════════════════════════
+    
+    window.IlmuAlamSitemap = {
         init: init,
         processLabels: processLabels,
-        processPosts: processPosts,
-        refresh: () => {
-            Object.keys(cache.posts).forEach(key => delete cache.posts[key]);
-            Object.keys(cache.timestamp).forEach(key => delete cache.timestamp[key]);
-            init();
-        }
+        loadAllPosts: loadAllPosts,
+        loadLabel: loadLabel,
+        goToPage: goToPage,
+        
+        // Expose config for customization
+        config: CONFIG,
+        
+        // Expose emoji map for additions
+        emojiMap: EMOJI_MAP
     };
 
+    // Auto-initialize when DOM is ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {
         init();
     }
+
 })();
