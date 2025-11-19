@@ -60,6 +60,7 @@
         'quran': '📖',
         'al-quran': '📖',
         'surah': '📜',
+        'surah pilihan': '📜',
         'ayat': '✨',
         'tafsir': '📚',
         'hafazan': '🎯',
@@ -78,6 +79,7 @@
         
         // Islamic Calendar & Events
         'ramadan': '🌙',
+        'ramadhan': '🌙',
         'puasa': '🌅',
         'hari raya': '🎉',
         'aidilfitri': '🎉',
