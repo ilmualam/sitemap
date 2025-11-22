@@ -4,7 +4,7 @@
  * @version 2.0.0
  * @author (IlmuAlam)
  * @license MIT
- * @repository https://github.com/ismal/ilmualam-sitemap
+ * @repository https://github.com/ilmualam/sitemap
  * 
  * Features:
  * - Islamic category emoji mapping
