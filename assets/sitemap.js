@@ -5,16 +5,6 @@
  * @author (IlmuAlam)
  * @license MIT
  * @repository https://github.com/ilmualam/sitemap
- * 
- * Features:
- * - Islamic category emoji mapping
- * - Limited label display (max 20)
- * - Brand color theming (#249749)
- * - SEO optimized with JSON-LD schema
- * - Responsive grid layout
- * - Pagination with styling
- * - YouTube thumbnail support
- * - Lazy loading images
  */
 
 (function() {
