@@ -81,6 +81,8 @@
         'ramadan': '🌙',
         'ramadhan': '🌙',
         'puasa': '🌅',
+        'berbuka puasa': '🌅',
+        'waktu berbuka': '🌅',
         'hari raya': '🎉',
         'aidilfitri': '🎉',
         'aidiladha': '🐑',
