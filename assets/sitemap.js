@@ -1,5 +1,5 @@
 /**
-   IlmuAlam Sitemap v3.0
+   IlmuAlam Sitemap v3.1
    Architecture: Batch-fetch ALL posts via token-chain,
    store client-side, paginate+filter+search in JS only.
    No broken start-index. No page-3 failure.
@@ -22,24 +22,15 @@ let searchQuery   = '';
 let sortMode      = 'newest';
 let isLoading     = true;
 
-/* ── DOM refs ── */
-const grid        = document.getElementById('ilmx-grid');
-const pagination  = document.getElementById('ilmx-pagination');
-const searchInput = document.getElementById('ilmx-search');
-const clearBtn    = document.getElementById('ilmx-search-clear');
-const sortSel     = document.getElementById('ilmx-sort');
-const resultsLbl  = document.getElementById('ilmx-results-label');
-const errorBox    = document.getElementById('ilmx-error');
-const backtop     = document.getElementById('ilmx-backtop');
+/* ── DOM refs (resolved once the DOM is ready, see init()) ── */
+let grid, pagination, searchInput, clearBtn, sortSel, resultsLbl, errorBox, backtop, tabsRow;
 
 /* ── Token-chain fetch: load ALL posts ── */
 async function fetchAllPosts(){
   let nextToken = null;
-  let batch     = 0;
 
   try {
     do {
-      batch++;
       let url = `${BLOG_URL}/feeds/posts/default?alt=json&max-results=${BATCH_SIZE}`;
       if(nextToken) url += `&start-index=${nextToken}`;
 
@@ -49,7 +40,7 @@ async function fetchAllPosts(){
       const feed = data.feed;
 
       /* Parse entries */
-      const entries = feed.entry || [];
+      const entries = feed?.entry || [];
       entries.forEach(e => {
         const title = e.title?.$t || '';
         const link  = (e.link || []).find(l => l.rel === 'alternate')?.href || '#';
@@ -60,15 +51,15 @@ async function fetchAllPosts(){
       });
 
       /* Check if more pages exist via openSearch total */
-      const total   = parseInt(feed.openSearch$totalResults?.$t || '0');
+      const total   = parseInt(feed?.openSearch$totalResults?.$t || '0');
       const loaded  = allPosts.length;
-      nextToken     = loaded < total ? loaded + 1 : null;
+      nextToken     = (entries.length && loaded < total) ? loaded + 1 : null;
 
     } while(nextToken);
 
   } catch(err){
     console.error('[IlmuAlam Sitemap]', err);
-    errorBox.style.display = 'block';
+    if(errorBox) errorBox.style.display = 'block';
   }
 
   isLoading = false;
@@ -87,31 +78,38 @@ function buildTabs(){
   /* Sort by post count desc */
   const sorted = Object.entries(labelMap).sort((a,b) => b[1]-a[1]);
 
-  document.getElementById('ilmx-count-all').textContent = allPosts.length;
+  const countAll = document.getElementById('ilmx-count-all');
+  if(countAll) countAll.textContent = allPosts.length;
 
-  const row = document.getElementById('ilmx-tabs');
+  tabsRow.innerHTML = '';
   sorted.forEach(([lbl, cnt]) => {
     const btn = document.createElement('button');
     btn.className     = 'ilmx-smp-tab';
+    btn.type          = 'button';
     btn.dataset.label = lbl;
     btn.setAttribute('role','tab');
     btn.setAttribute('aria-selected','false');
     btn.innerHTML = `${escHtml(lbl)} <span class="ilmx-smp-tab-count">${cnt}</span>`;
-    row.appendChild(btn);
+    tabsRow.appendChild(btn);
   });
 
   /* Hide right-fade arrow when scrolled to end */
   const arrow = document.getElementById('ilmx-filter-arrow');
-  row.addEventListener('scroll', () => {
-    const atEnd = row.scrollLeft + row.clientWidth >= row.scrollWidth - 8;
-    arrow.classList.toggle('hidden', atEnd);
-  }, {passive:true});
+  if(arrow){
+    tabsRow.addEventListener('scroll', () => {
+      const atEnd = tabsRow.scrollLeft + tabsRow.clientWidth >= tabsRow.scrollWidth - 8;
+      arrow.classList.toggle('hidden', atEnd);
+    }, {passive:true});
+  }
 
   /* Update hero stats */
-  const years = new Set(allPosts.map(p => p.date.slice(0,4)));
-  document.getElementById('ilmx-total-count').textContent = allPosts.length;
-  document.getElementById('ilmx-cat-count').textContent   = sorted.length;
-  document.getElementById('ilmx-year-count').textContent  = years.size;
+  const years = new Set(allPosts.map(p => p.date.slice(0,4)).filter(Boolean));
+  const totalEl = document.getElementById('ilmx-total-count');
+  const catEl   = document.getElementById('ilmx-cat-count');
+  const yearEl  = document.getElementById('ilmx-year-count');
+  if(totalEl) totalEl.textContent = allPosts.length;
+  if(catEl)   catEl.textContent   = sorted.length;
+  if(yearEl)  yearEl.textContent  = years.size;
 }
 
 /* ── Filter + sort posts ── */
@@ -155,9 +153,11 @@ function renderPage(){
   /* Results label */
   const from = total ? start + 1 : 0;
   const to   = Math.min(start + PER_PAGE, total);
-  resultsLbl.innerHTML = total
-    ? `Menunjukkan <strong>${from}–${to}</strong> daripada <strong>${total}</strong> artikel`
-    : 'Tiada artikel ditemui';
+  if(resultsLbl){
+    resultsLbl.innerHTML = total
+      ? `Menunjukkan <strong>${from}–${to}</strong> daripada <strong>${total}</strong> artikel`
+      : 'Tiada artikel ditemui';
+  }
 
   /* Grid */
   if(total === 0){
@@ -168,44 +168,30 @@ function renderPage(){
         <p>Cuba kata kunci lain atau pilih kategori yang berbeza.</p>
       </div>`;
     pagination.innerHTML = '';
+    updateStructuredData([]);
     return;
   }
 
   grid.innerHTML = slice.map(p => cardHTML(p)).join('');
   renderPagination(pages);
-
-  /* Lazy images */
-  grid.querySelectorAll('img[data-src]').forEach(img => {
-    if('IntersectionObserver' in window){
-      const io = new IntersectionObserver(entries => {
-        entries.forEach(en => {
-          if(en.isIntersecting){
-            en.target.src = en.target.dataset.src;
-            en.target.removeAttribute('data-src');
-            io.disconnect();
-          }
-        });
-      },{rootMargin:'200px'});
-      io.observe(img);
-    } else {
-      img.src = img.dataset.src;
-    }
-  });
+  updateStructuredData(slice, start);
 }
 
 /* ── Card HTML ── */
 function cardHTML(p){
   const date    = p.date ? new Date(p.date).toLocaleDateString('ms-MY',{day:'numeric',month:'short',year:'numeric'}) : '';
   const label   = p.cats[0] || 'Umum';
+  const alt     = escHtml(p.title || 'Artikel IlmuAlam');
+  const href    = escHtml(p.link);
   const thumbEl = p.thumb
-    ? `<img data-src="${p.thumb}" alt="${escHtml(p.title)}" width="400" height="225" loading="lazy" style="display:block">`
+    ? `<img src="${escHtml(p.thumb)}" alt="${alt}" width="400" height="225" loading="lazy" decoding="async" style="display:block">`
     : `<div class="ilmx-smp-card-thumb-placeholder">📖</div>`;
 
-  return `<a href="${p.link}" class="ilmx-smp-card" target="_blank" rel="noopener">
+  return `<a href="${href}" class="ilmx-smp-card" rel="bookmark">
     <div class="ilmx-smp-card-thumb">${thumbEl}</div>
     <div class="ilmx-smp-card-body">
       <span class="ilmx-smp-card-label">${escHtml(label)}</span>
-      <div class="ilmx-smp-card-title">${escHtml(p.title)}</div>
+      <h3 class="ilmx-smp-card-title">${escHtml(p.title)}</h3>
       <div class="ilmx-smp-card-date">📅 ${date}</div>
     </div>
   </a>`;
@@ -219,7 +205,7 @@ function renderPagination(pages){
   let html  = '';
 
   /* Prev */
-  html += `<button class="ilmx-smp-page-btn" id="ilmx-pg-prev" ${cur===1?'disabled':''} aria-label="Halaman sebelumnya">‹</button>`;
+  html += `<button class="ilmx-smp-page-btn" id="ilmx-pg-prev" type="button" ${cur===1?'disabled':''} aria-label="Halaman sebelumnya">‹</button>`;
 
   /* Page numbers with ellipsis */
   const range = pageRange(cur, pages);
@@ -228,12 +214,12 @@ function renderPagination(pages){
     if(prev !== null && n - prev > 1){
       html += `<span class="ilmx-smp-page-ellipsis">…</span>`;
     }
-    html += `<button class="ilmx-smp-page-btn${n===cur?' active':''}" data-page="${n}" aria-label="Halaman ${n}" aria-current="${n===cur?'page':'false'}">${n}</button>`;
+    html += `<button class="ilmx-smp-page-btn${n===cur?' active':''}" type="button" data-page="${n}" aria-label="Halaman ${n}" aria-current="${n===cur?'page':'false'}">${n}</button>`;
     prev = n;
   });
 
   /* Next */
-  html += `<button class="ilmx-smp-page-btn" id="ilmx-pg-next" ${cur===pages?'disabled':''} aria-label="Halaman seterusnya">›</button>`;
+  html += `<button class="ilmx-smp-page-btn" id="ilmx-pg-next" type="button" ${cur===pages?'disabled':''} aria-label="Halaman seterusnya">›</button>`;
 
   pagination.innerHTML = html;
 
@@ -264,72 +250,149 @@ function buildUI(){
   applyFilter();
 }
 
-/* ── Escape HTML ── */
+/* ── Escape HTML (safe for both text content and attribute values) ── */
 function escHtml(s){
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
-/* ── Events ── */
+/* ── SEO: keep an ItemList JSON-LD in sync with what's currently on screen ──
+   Lets search engines understand the sitemap's contents even though
+   the cards themselves are rendered client-side. */
+function updateStructuredData(items, offset){
+  let el = document.getElementById('ilmx-sitemap-jsonld');
+  if(!el){
+    el = document.createElement('script');
+    el.type = 'application/ld+json';
+    el.id   = 'ilmx-sitemap-jsonld';
+    document.head.appendChild(el);
+  }
+  const json = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    'name': activeLabel === 'all' ? 'Sitemap Artikel — IlmuAlam' : `Artikel: ${activeLabel} — IlmuAlam`,
+    'url': BLOG_URL,
+    'isPartOf': { '@type': 'WebSite', 'name': 'IlmuAlam', 'url': BLOG_URL },
+    'mainEntity': {
+      '@type': 'ItemList',
+      'numberOfItems': items.length,
+      'itemListElement': items.map((p, i) => ({
+        '@type': 'ListItem',
+        'position': (offset || 0) + i + 1,
+        'url': p.link,
+        'name': p.title
+      }))
+    }
+  };
+  el.textContent = JSON.stringify(json);
+}
 
-/* Tab click — delegated on scroll row */
-document.getElementById('ilmx-tabs').addEventListener('click', e => {
-  const btn = e.target.closest('.ilmx-smp-tab');
-  if(!btn) return;
-  document.querySelectorAll('#ilmx-tabs .ilmx-smp-tab').forEach(t => {
-    t.classList.remove('active');
-    t.setAttribute('aria-selected','false');
-  });
-  btn.classList.add('active');
-  btn.setAttribute('aria-selected','true');
-  activeLabel = btn.dataset.label;
-  /* Snap active tab into view */
-  btn.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
-  applyFilter();
-});
+/* ── FAQ accordion toggle ──
+   Called from an inline onclick="ilmxSitemapFaq(this)" in the page markup,
+   so it must live on window — it previously stayed trapped inside this
+   module's closure and every click threw "ilmxSitemapFaq is not defined". */
+function ilmxSitemapFaq(btn){
+  const ans  = btn.nextElementSibling;
+  const icon = btn.querySelector('.ilmx-sitemap-faq-icon');
+  if(!ans) return;
 
-/* Search */
-let searchTimer;
-searchInput.addEventListener('input', () => {
-  clearBtn.classList.toggle('visible', !!searchInput.value);
-  clearTimeout(searchTimer);
-  searchTimer = setTimeout(()=>{
-    searchQuery = searchInput.value;
+  const open = ans.classList.toggle('open');
+  btn.setAttribute('aria-expanded', String(open));
+  if(icon) icon.textContent = open ? '−' : '+';
+}
+window.ilmxSitemapFaq = ilmxSitemapFaq;
+
+/* ── Wire up events (elements are guaranteed to exist once init() runs) ── */
+function bindEvents(){
+  /* Tab click — delegated on scroll row */
+  tabsRow.addEventListener('click', e => {
+    const btn = e.target.closest('.ilmx-smp-tab');
+    if(!btn) return;
+    tabsRow.querySelectorAll('.ilmx-smp-tab').forEach(t => {
+      t.classList.remove('active');
+      t.setAttribute('aria-selected','false');
+    });
+    btn.classList.add('active');
+    btn.setAttribute('aria-selected','true');
+    activeLabel = btn.dataset.label;
+    /* Snap active tab into view */
+    btn.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
     applyFilter();
-  }, 280);
-});
+  });
 
-clearBtn.addEventListener('click', ()=>{
-  searchInput.value = '';
-  searchQuery       = '';
-  clearBtn.classList.remove('visible');
-  applyFilter();
-  searchInput.focus();
-});
+  /* Search */
+  if(searchInput){
+    let searchTimer;
+    searchInput.addEventListener('input', () => {
+      if(clearBtn) clearBtn.classList.toggle('visible', !!searchInput.value);
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(()=>{
+        searchQuery = searchInput.value;
+        applyFilter();
+      }, 280);
+    });
+  }
 
-/* Sort */
-sortSel.addEventListener('change', ()=>{
-  sortMode = sortSel.value;
-  applyFilter();
-});
+  if(clearBtn && searchInput){
+    clearBtn.addEventListener('click', ()=>{
+      searchInput.value = '';
+      searchQuery       = '';
+      clearBtn.classList.remove('visible');
+      applyFilter();
+      searchInput.focus();
+    });
+  }
 
-/* Back to top */
-window.addEventListener('scroll', ()=>{
-  backtop.classList.toggle('visible', window.scrollY > 400);
-}, {passive:true});
+  /* Sort */
+  if(sortSel){
+    sortSel.addEventListener('change', ()=>{
+      sortMode = sortSel.value;
+      applyFilter();
+    });
+  }
 
-backtop.addEventListener('click', ()=>{
-  window.scrollTo({top:0,behavior:'smooth'});
-});
+  /* Back to top */
+  if(backtop){
+    window.addEventListener('scroll', ()=>{
+      backtop.classList.toggle('visible', window.scrollY > 400);
+    }, {passive:true});
 
-/* ── Boot ── */
-setTimeout(()=>{ fetchAllPosts(); }, 300);
-  
-  function ilmxSitemapFaq(btn){
-  const ans=btn.nextElementSibling;
-  const icon=btn.querySelector(".ilmx-sitemap-faq-icon");
+    backtop.addEventListener('click', ()=>{
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+  }
+}
 
-  ans.classList.toggle("open");
-  icon.textContent=ans.classList.contains("open")?"\u207B":"+";
+/* ── Boot ──
+   Resolve DOM refs and bind events only once the document is actually
+   ready. Previously these ran the instant the script tag loaded, so if
+   the widget's markup hadn't been parsed yet, getElementById() returned
+   null and the very next call (.addEventListener on a null tabs row)
+   threw — silently killing search, sort, pagination and the FAQ toggle
+   in one shot. */
+function init(){
+  grid        = document.getElementById('ilmx-grid');
+  pagination  = document.getElementById('ilmx-pagination');
+  searchInput = document.getElementById('ilmx-search');
+  clearBtn    = document.getElementById('ilmx-search-clear');
+  sortSel     = document.getElementById('ilmx-sort');
+  resultsLbl  = document.getElementById('ilmx-results-label');
+  errorBox    = document.getElementById('ilmx-error');
+  backtop     = document.getElementById('ilmx-backtop');
+  tabsRow     = document.getElementById('ilmx-tabs');
+
+  if(!grid || !pagination || !tabsRow){
+    console.warn('[IlmuAlam Sitemap] Required elements not found on this page — skipping init.');
+    return;
+  }
+
+  bindEvents();
+  setTimeout(fetchAllPosts, 300);
+}
+
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', init, {once:true});
+} else {
+  init();
 }
 
 })();
